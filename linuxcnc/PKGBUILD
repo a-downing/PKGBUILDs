@@ -5,10 +5,7 @@ pkgdesc="Controls CNC machines. It can drive milling machines, lathes, 3d printe
 arch=('i686' 'x86_64' 'armv7h')
 license=('GPL2')
 url="http://linuxcnc.org"
-depends=('bc'
-         'bwidget'
-         'libxaw'
-         'python2-imaging'
+depends=('bwidget'
          'python2-yapps2'
          'tkimg'
          'pygtk'
