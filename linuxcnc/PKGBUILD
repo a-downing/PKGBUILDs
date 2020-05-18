@@ -1,0 +1,48 @@
+pkgname=linuxcnc
+pkgver=v2.9.0.pre0.r2076.g946aab67e
+pkgrel=1
+pkgdesc="Controls CNC machines. It can drive milling machines, lathes, 3d printers, laser cutters, plasma cutters, robot arms, hexapods, and more (formerly EMC2)"
+arch=('i686' 'x86_64' 'armv7h')
+license=('GPL2')
+url="http://linuxcnc.org"
+depends=('bc'
+         'bwidget'
+         'libxaw'
+         'python2-imaging'
+         'python2-yapps2'
+         'tkimg'
+         'pygtk'
+         'tclx'
+         'xorg-server'
+         'boost'
+         'procps-ng'
+         'psmisc')
+makedepends=('intltool')
+source=("${pkgname}::git+https://github.com/LinuxCNC/linuxcnc.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$pkgname"
+  git describe --long | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+  cd "${srcdir}/${pkgname}/src"
+  ./autogen.sh
+  ./configure --with-realtime=uspace --without-libmodbus --prefix=/usr --with-python=/usr/bin/python2.7 --enable-non-distributable=yes
+}
+
+build () {
+  cd "${srcdir}/${pkgname}/src"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}/src"
+  DESTDIR=${pkgdir} make install
+  cp -PR "${srcdir}/${pkgname}/share/applications" $pkgdir/usr/share
+  mkdir -p "${pkgdir}/etc/xdg"
+  cp -PR "${srcdir}/${pkgname}/share/menus" "${pkgdir}/etc/xdg/"
+  sed -i "s|${srcdir}||" "${pkgdir}/usr/include/linuxcnc/config.h"
+  sed -i "s|${srcdir}||" "${pkgdir}/usr/share/linuxcnc/Makefile.modinc"
+}
